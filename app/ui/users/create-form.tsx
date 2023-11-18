@@ -47,12 +47,12 @@ export default function Form(){
     accountType: "PersonalTrainer",
   };
   const [formData, setFormData] = useState(initialState);
-  const handleChange = (event) => {
+  const handleChange = (event: any) => {
     const { name, value } = event.target;
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
   };
 
-  const handleSubmit = (event) => { 
+  const handleSubmit = (event: any) => { 
     event.preventDefault();
     console.log("Hello");
     createUser(formData, session!)
