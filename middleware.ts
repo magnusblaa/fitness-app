@@ -3,7 +3,7 @@
 import { getToken } from "next-auth/jwt"
 import { withAuth } from "next-auth/middleware"
 import { decode } from 'next-auth/jwt';
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 // export { default } from "next-auth/middleware"
 
@@ -19,6 +19,7 @@ export default withAuth(
           token != null &&
           token.role === 'Manager'
         ) {
+          NextResponse.redirect('/Manager');
           return true
         }
         if (
