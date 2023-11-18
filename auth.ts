@@ -1,25 +1,19 @@
 import NextAuth from "next-auth"
 import Credentials from 'next-auth/providers/credentials';
-import CredentialsProvider from "next-auth/providers/credentials";
-import type { NextAuthConfig } from "next-auth"
-import GitHub from "next-auth/providers/github"
-import { NextResponse } from "next/server";
+import CredentialsProvider from 'next-auth/providers/credentials'
+import type { AuthOptions, User } from "next-auth"
+import { getToken } from "next-auth/jwt";
 
-export const config ={
-  session: {
-    strategy: "jwt"
-  },
+export const authOptions: AuthOptions = {
   providers: [
-    GitHub,
-    Credentials({
-    
+    CredentialsProvider({
     name: "Credentials",
     credentials: {
       email: { label: "Email", type: "text" },
       password: { label: "Password", type: "password" }
     },
     async authorize(credentials, req) {
-      const LoginDTO = {email: credentials.email, password: credentials.password}
+      const LoginDTO = {email: credentials?.email, password: credentials?.password}
       console.log(LoginDTO)
       const res = await fetch('https://afefitness2023.azurewebsites.net/api/Users/login', {
         method:'POST',
@@ -32,48 +26,44 @@ export const config ={
         return null;
       }
       const data = await res.json();
-      console.log(data);
-      return data;
+
+      const userDataFromToken = decodeToken(data.jwt);
+
+      const newUser: User = {
+        jwtToken: data.jwt,
+        role: userDataFromToken.Role,
+        name: userDataFromToken.Name,
+        id: userDataFromToken.UserId
+      }
+
+      return newUser;
+
     },
     
   })
   ],
   
   callbacks: {
-    async authorized({ request, auth }) {
-      // const url = request.nextUrl
-      const isLoggedIn = !!auth;
-      if (isLoggedIn){
-        return true;
-      } else{
-        return false;
-      }
-      
-      // if(request.method === "POST") {
-      //   const { authToken } = (await request.json()) ?? {}
-      //   // If the request has a valid auth token, it is authorized
-      //   const valid = await validateAuthToken(authToken)
-      //   if(valid) return true
-      //   return NextResponse.json("Invalid auth token", { status: 401 })
-      // }
-    
-      // // Logged in users are authenticated, otherwise redirect to login page
-      // return !!auth?.user
-      
-    },
     async jwt({token, user}){
-      if(user){
-        return {...token, ...user};
-      }
-      return token;
+      // token.jwtToken = user.jwtToken;
+      // token.name = user.name;
+      // token.role = user.role;
+      // token.userId = user.id
+      return {...token, ...user};
     },
     async session({session, token, user}){
-      if (token){
-        session.user = token;
-      }
+      session.user = token as any;
       return session;
-    }
+    },
   }
-} satisfies NextAuthConfig
+}
 
-export const { handlers, auth, signIn, signOut } = NextAuth(config)
+function decodeToken(token: string) {
+  var base64Url = token.split('.')[1];
+  var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  var jsonPayload = Buffer.from(base64, 'base64').toString('utf-8')
+  console.log(JSON.parse(jsonPayload))  
+  return JSON.parse(jsonPayload);
+}
+
+export const handler = NextAuth(authOptions)
