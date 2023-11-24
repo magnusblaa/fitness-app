@@ -1,11 +1,12 @@
 import NextAuth from "next-auth"
-import Credentials from 'next-auth/providers/credentials';
 import CredentialsProvider from 'next-auth/providers/credentials'
 import type { AuthOptions, User } from "next-auth"
-import { getToken } from "next-auth/jwt";
 
 export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt"
+  },
   providers: [
     CredentialsProvider({
     name: "Credentials",
@@ -46,10 +47,6 @@ export const authOptions: AuthOptions = {
   
   callbacks: {
     async jwt({token, user}){
-      // token.jwtToken = user.jwtToken;
-      // token.name = user.name;
-      // token.role = user.role;
-      // token.userId = user.id
       return {...token, ...user};
     },
     async session({session, token, user}){

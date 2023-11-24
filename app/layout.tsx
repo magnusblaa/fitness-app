@@ -4,6 +4,7 @@ import './globals.css'
 import Provider from './provider/context-provider'
 import { getServerSession } from "next-auth/next"
 import { authOptions } from '@/auth'
+import AppBar from '@/app/ui/appbar';
 
 const inter = Inter({ subsets: ['latin'] })
 

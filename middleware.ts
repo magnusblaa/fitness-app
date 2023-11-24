@@ -1,39 +1,36 @@
-// export { auth as middleware } from "./auth"
-// export { auth as default } from "./auth"
 import { getToken } from "next-auth/jwt"
 import { withAuth } from "next-auth/middleware"
-import { decode } from 'next-auth/jwt';
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-// export { default } from "next-auth/middleware"
+import { NextResponse } from "next/server";
 
 export default withAuth(
-  function middleware (req) {
+  async function middleware (req, event) {
+    const token = await getToken({req});
+    const url = req.nextUrl.clone()
+    console.log(url.pathname)
+    if(token?.role === 'Manager') {
+      if(!url.pathname.startsWith('/manager')){
+        return NextResponse.redirect(new URL('/manager', req.url))
+      }
+    }
+    else if (token?.role === 'PersonalTrainer'){
+      if(!url.pathname.startsWith('/personalTrainer')){
+        return NextResponse.redirect(new URL('/personalTrainer/workoutProgram', req.url))
+      }
+    }
+    else if (token?.role === 'Client'){
+      if(!url.pathname.startsWith('/client')){
+        return NextResponse.redirect(new URL('/client/workoutProgram', req.url))
+      }
+    }
   },
   {
     callbacks: {
       authorized: ({ req, token }) => {
-        console.log('middleware',token)
-        if (
-          // req.nextUrl.pathname.startsWith('/manager') &&
-          token != null &&
-          token.role === 'Manager'
-        ) {
-          NextResponse.redirect('/Manager');
-          return true
-        }
-        if (
-          // req.nextUrl.pathname.startsWith('/test') &&
-          token != null &&
-          token.role === 'PersonalTrainer'
-        ) {
-          return true
-        }
-        return false;
+        return token != null;
       }
     }
   }
 )
-// export const config = {
-//   matcher: ["/test"],
-// }
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|.png).*)'],
+}
