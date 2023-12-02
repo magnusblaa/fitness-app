@@ -17,6 +17,7 @@ export async function addWorkoutProgram(session: Session, workoutProgram: Workou
       },);
       if(!res.ok){
         return {
+          ok: false,
           message: 'Server failed to Create WorkoutProgram.',
         };
       }
@@ -25,6 +26,7 @@ export async function addWorkoutProgram(session: Session, workoutProgram: Workou
     } catch (error) {
       console.log(error)
       return {
+        ok: false,
         message: 'Server failed to Create WorkoutProgram.',
       };
     }
@@ -67,6 +69,7 @@ export async function addExerciseToWorkoutProgram(session: Session, exercise: Ex
       },);
       if(!res.ok){
         return {
+          ok: false,
           message: 'Server failed to Create Exercise.',
         };
       }
@@ -75,6 +78,7 @@ export async function addExerciseToWorkoutProgram(session: Session, exercise: Ex
     } catch (error) {
       console.log(error)
       return {
+        ok: false,
         message: 'Server failed to Create Exercise.',
       };
     }
@@ -158,14 +162,20 @@ export async function createUser(user: User, session: Session){
       });
       if(!res.ok){
         return {
+          ok: false,
           message: 'Server failed to Create User.',
         };
       }
       const data = await res.json();
       console.log(data);
+      return {
+        ok: true,
+        message: 'The new user was created.',
+      };
     } catch (error) {
       console.log(error)
       return {
+        ok: false,
         message: 'Server failed to Create User.',
       };
     }

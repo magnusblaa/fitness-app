@@ -22,7 +22,7 @@ export default function UserForm(){
   };
 
   const [formData, setFormData] = useState(initialState);
-  const [inputError, setInputError] = useState('');
+  const [result, setResult] = useState({ok: true, message: ''});
 
   const handleChange = (event: any) => {
     const { name, value } = event.target;
@@ -32,7 +32,7 @@ export default function UserForm(){
   const handleSubmit = async (event: any) => { 
     event.preventDefault();
     let res = await createUser(formData, session!)
-    setInputError(res?.message || '');
+    setResult(res);
   };
   
     return (
@@ -78,7 +78,8 @@ export default function UserForm(){
               label="Password"
               value={formData.password!}
               onChange={handleChange}/>
-            {inputError != '' && <div style={{ color: 'red' }}>{inputError}</div>}
+            {!result.ok && <div style={{ color: 'red' }}>{result.message}</div>}
+            {result.ok && <div style={{ color: 'green' }}>{result.message}</div>}
             <Button 
               variant="outlined" 
               type="submit"
