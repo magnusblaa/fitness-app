@@ -20,16 +20,20 @@ export default function UserForm(){
     accountType: session?.user.role == "PersonalTrainer"? 'Client': 'PersonalTrainer',
     userId: 0,
   };
+
   const [formData, setFormData] = useState(initialState);
+  const [inputError, setInputError] = useState('');
+
   const handleChange = (event: any) => {
     const { name, value } = event.target;
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
   };
 
-  const handleSubmit = (event: any) => { 
+  const handleSubmit = async (event: any) => { 
     event.preventDefault();
-    createUser(formData, session!)
-  } ;
+    let res = await createUser(formData, session!)
+    setInputError(res?.message || '');
+  };
   
     return (
       <Container maxWidth="xs">
@@ -74,7 +78,7 @@ export default function UserForm(){
               label="Password"
               value={formData.password!}
               onChange={handleChange}/>
-            
+            {inputError != '' && <div style={{ color: 'red' }}>{inputError}</div>}
             <Button 
               variant="outlined" 
               type="submit"

@@ -27,15 +27,17 @@ export default function ExerciseForm({
       personalTrainerId: null
   };
   const [formData, setFormData] = useState(initialState);
+  const [inputError, setInputError] = useState('');
 
   const handleChange = (event: any) => {
     const { name, value } = event.target;
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
   };
 
-  const handleSubmit = (event: any) => { 
+  const handleSubmit = async (event: any) => { 
     event.preventDefault();
-    addExerciseToWorkoutProgram(session!, formData, workoutProgramId)
+    let res = await addExerciseToWorkoutProgram(session!, formData, workoutProgramId)
+    setInputError(res?.message || '');
   } ;
 
     return (
@@ -83,6 +85,7 @@ export default function ExerciseForm({
             value={formData.time!}
             onChange={handleChange}
           />
+          {inputError != '' && <div style={{ color: 'red' }}>{inputError}</div>}
           <Button 
             variant="outlined" 
             type="submit"

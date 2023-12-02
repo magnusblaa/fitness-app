@@ -9,7 +9,6 @@ import { CreateClientButton } from "./create-button";
 
 export default async function ClientTable() {
   const session = await getServerSession(authOptions);
-
   const clients: User[] = await getClients(session!);
 
   return (

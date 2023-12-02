@@ -4,7 +4,6 @@ import { Exercise, User, WorkoutProgram } from "./definitions";
 import { Session } from "next-auth";
 import { redirect } from "next/navigation";
 
-
 export async function addWorkoutProgram(session: Session, workoutProgram: WorkoutProgram){
   try {
 
@@ -17,13 +16,17 @@ export async function addWorkoutProgram(session: Session, workoutProgram: Workou
         body: JSON.stringify(workoutProgram)
       },);
       if(!res.ok){
-         return null;
+        return {
+          message: 'Server failed to Create WorkoutProgram.',
+        };
       }
       const data = await res.json();
       console.log(data);
     } catch (error) {
       console.log(error)
-      return null;
+      return {
+        message: 'Server failed to Create WorkoutProgram.',
+      };
     }
     revalidateTag('workoutProgram')
     redirect(`/personalTrainer/workoutProgram`);
@@ -40,14 +43,14 @@ export async function getWorkoutProgram(session: Session, workoutProgramId: numb
         },
       });
       if(!res.ok){
-         return null;
+        throw new Error("Something went wrong")
       }
       const data = await res.json();
       console.log(data);
       return data;
     } catch (error) {
       console.log(error)
-      return null;
+      throw new Error("Something went wrong")
     }
 }
 
@@ -63,13 +66,17 @@ export async function addExerciseToWorkoutProgram(session: Session, exercise: Ex
         body: JSON.stringify(exercise)
       },);
       if(!res.ok){
-         return null;
+        return {
+          message: 'Server failed to Create Exercise.',
+        };
       }
       const data = await res.json();
       console.log(data);
     } catch (error) {
       console.log(error)
-      return null;
+      return {
+        message: 'Server failed to Create Exercise.',
+      };
     }
     revalidateTag('workoutProgram')
     redirect(`/personalTrainer/workoutProgram/${workoutProgramId}/details`);
@@ -86,14 +93,14 @@ export async function getClients(session: Session){
         },
       });
       if(!res.ok){
-         return null;
+        throw new Error("Something went wrong")
       }
       const data = await res.json();
       console.log(data);
       return data;
     } catch (error) {
       console.log(error)
-      return null;
+      throw new Error("Something went wrong")
     }
 }
 export async function getClientWorkoutPrograms(session: Session){
@@ -106,14 +113,14 @@ export async function getClientWorkoutPrograms(session: Session){
         },
       });
       if(!res.ok){
-         return null;
+        throw new Error("Something went wrong")
       }
       const data = await res.json();
       console.log(data);
       return data;
     } catch (error) {
       console.log(error)
-      return null;
+      throw new Error("Something went wrong")
     }
 }
 export async function getWorkoutPrograms(session: Session){
@@ -126,14 +133,14 @@ export async function getWorkoutPrograms(session: Session){
         },
       });
       if(!res.ok){
-         return null;
+         throw new Error("Something went wrong")
       }
       const data = await res.json();
       console.log(data);
       return data;
     } catch (error) {
       console.log(error)
-      return null;
+      throw new Error("Something went wrong")
     }
 }
 
@@ -150,17 +157,20 @@ export async function createUser(user: User, session: Session){
         body: JSON.stringify(user)
       });
       if(!res.ok){
-         return null
+        return {
+          message: 'Server failed to Create User.',
+        };
       }
       const data = await res.json();
       console.log(data);
     } catch (error) {
       console.log(error)
       return {
-        message: 'Error',
+        message: 'Server failed to Create User.',
       };
     }
     revalidateTag('client')
-    // redirect('/client');
-  
+    if(session.user.role == 'PersonalTrainer'){
+      redirect('/personalTrainer/client');
+    }
 }
