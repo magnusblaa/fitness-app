@@ -168,14 +168,6 @@ export async function createUser(user: User, session: Session){
       }
       const data = await res.json();
       console.log(data);
-      revalidateTag('client')
-      if(session.user.role == 'PersonalTrainer'){
-        redirect('/personalTrainer/client');
-      }
-      return {
-        ok: true,
-        message: 'The new user was created.',
-      };
     } catch (error) {
       console.log(error)
       return {
@@ -183,4 +175,9 @@ export async function createUser(user: User, session: Session){
         message: 'Server failed to Create User.',
       };
     }
+    revalidateTag('client')
+    return {
+      ok: true,
+      message: 'The new user was created.',
+    };
 }
